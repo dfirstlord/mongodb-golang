@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -118,7 +119,117 @@ func main() {
 	// }
 	// fmt.Printf("Documents updated: %v\n", result.ModifiedCount)
 
-	
+	//read
+	//select * from student
+	cursor, err := coll.Find(ctx, bson.D{})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	var students []bson.D
+	err = cursor.All(ctx, &students)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for _, student := range students {
+		fmt.Println("Select *", student)
+	}
+
+	//projection
+	// opts := options.Find().SetProjection(bson.D{{Key: "age", Value: 1}, {Key: "gender", Value: 1}, {Key: "_id", Value: 1}})
+	// cursor, err := coll.Find(ctx, bson.D{}, opts)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+	// var results []bson.D
+	// if err = cursor.All(ctx, &results); err != nil {
+	// 	log.Println(err.Error())
+	// }
+	// for _, result := range results {
+	// 	fmt.Println(result)
+	// }
+
+	//Logical
+	filterGenderAndAge := bson.D{
+		{
+			Key: "$and", Value: bson.A{
+				bson.D{
+					{"gender", "F"},
+					{Key: "age", Value: bson.D{{Key: "$gt", Value: 15}}},
+				},
+			},
+		},
+	}
+
+	projection := bson.D{
+		{Key: "_id", Value: 1},
+		{Key: "gender", Value: 1},
+		{Key: "age", Value: 1},
+	}
+
+	// studentx, err := coll.Find(ctx, filterGenderAndAge, options.Find().SetProjection(projection))
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// err = studentx.All(ctx, &students)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+	//mapping result query ke struct
+	filterGenderAndAgeResult := make([]*Student, 0)
+	cursor, err = coll.Find(ctx, filterGenderAndAge, options.Find().SetProjection(projection))
+	if err != nil {
+		log.Println(err)
+	}
+	for cursor.Next(ctx) {
+		var student Student
+		err := cursor.Decode(&student)
+		if err != nil {
+			log.Println(err.Error())
+		}
+		filterGenderAndAgeResult = append(filterGenderAndAgeResult, &student)
+	}
+	for _, student := range filterGenderAndAgeResult {
+		fmt.Println("Filter by gender and age", student)
+	}
+
+	//aggregation
+	colll := connect.Database("enigma").Collection("products")
+	count, err := colll.CountDocuments(ctx, bson.D{{"category", "food"}})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	fmt.Println("Product total in food category", count)
+
+	//match
+	matchStage := bson.D{
+		{
+			Key: "$match", Value: bson.D{
+				{Key: "category", Value: "food"},
+			},
+		},
+	}
+
+	groupStage := bson.D{
+		{
+			Key: "$group", Value: bson.D{
+				{Key: "_id", Value: "$category"},
+				{Key: "Total", Value: bson.D{{"$sum", 1}}},
+			},
+		},
+	}
+
+	cursor, err = colll.Aggregate(ctx, mongo.Pipeline{matchStage, groupStage})
+	if err != nil {
+		log.Println(err.Error())
+	}
+	var productCount []bson.M
+	err = cursor.All(ctx, &productCount)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	for _, product := range productCount {
+		fmt.Printf("Group[%v], Total [%v]\n", product["_id"], product["Total"])
+	}
 }
 
 func parseTime(date string) time.Time {
