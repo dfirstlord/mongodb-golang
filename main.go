@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -101,14 +100,20 @@ func main() {
 	// }
 	// fmt.Printf("inserted document with ID %v\n", result.InsertedID)
 
-	filter := bson.D{{"name", "Twilight"}}
-}
+	//delete
+// 	filter := bson.D{{"fullName", "Dona"}}
+// 	result, err := coll.DeleteOne(ctx, filter)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Printf("Number of documents deleted: %d\n", result.DeletedCount)
+// }
 
-func parseTime(date string) time.Time {
-	layoutFormat := "2006-01-02 15:04:05"
-	parse, _ := time.Parse(layoutFormat, date)
-	return parse
-}
+// func parseTime(date string) time.Time {
+// 	layoutFormat := "2006-01-02 15:04:05"
+// 	parse, _ := time.Parse(layoutFormat, date)
+// 	return parse
+// }
 
 /*
 Buat koneksi ke mongodb
