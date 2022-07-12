@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -86,20 +86,22 @@ func main() {
 	// }
 	// fmt.Printf("inserted document with ID %v\n", result.InsertedIDs)
 
-	newStudent := Student{
-		Id:       primitive.NewObjectID(),
-		Name:     "Dino",
-		Age:      25,
-		Gender:   "M",
-		JoinDate: primitive.NewDateTimeFromTime(parseTime("2022-05-22 14:00:45")),
-		Senior:   false,
-	}
+	// newStudent := Student{
+	// 	Id:       primitive.NewObjectID(),
+	// 	Name:     "Dino",
+	// 	Age:      25,
+	// 	Gender:   "M",
+	// 	JoinDate: primitive.NewDateTimeFromTime(parseTime("2022-05-22 14:00:45")),
+	// 	Senior:   false,
+	// }
 
-	result, err := coll.InsertOne(ctx, newStudent)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	fmt.Printf("inserted document with ID %v\n", result.InsertedID)
+	// result, err := coll.InsertOne(ctx, newStudent)
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+	// fmt.Printf("inserted document with ID %v\n", result.InsertedID)
+
+	filter := bson.D{{"name", "Twilight"}}
 }
 
 func parseTime(date string) time.Time {
