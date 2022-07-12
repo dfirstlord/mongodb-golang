@@ -101,13 +101,22 @@ func main() {
 	// fmt.Printf("inserted document with ID %v\n", result.InsertedID)
 
 	//delete
-// 	filter := bson.D{{"fullName", "Dona"}}
-// 	result, err := coll.DeleteOne(ctx, filter)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Printf("Number of documents deleted: %d\n", result.DeletedCount)
-// }
+	// filter := bson.D{{"fullName", "Dona"}}
+	// result, err := coll.DeleteOne(ctx, filter)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Printf("Number of documents deleted: %d\n", result.DeletedCount)
+
+	//updategit
+	filter := bson.D{{Key: "fullName", Value: "Doni"}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "fullName", Value: "Ridwan"}}}}
+	result, err := coll.UpdateOne(ctx, filter, update)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Documents updated: %v\n", result.ModifiedCount)
+}
 
 // func parseTime(date string) time.Time {
 // 	layoutFormat := "2006-01-02 15:04:05"
